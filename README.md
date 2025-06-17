@@ -152,23 +152,3 @@ rf_classifier_categorization = pickle.load(open("path/to/your/model.pkl", "rb"))
 4. Push to the branch (`git push origin feature/new-feature`)
 5. Create a Pull Request
 
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Future Enhancements
-
-- Support for more file formats (DOCX, RTF)
-- Advanced NLP for better information extraction
-- Integration with job portals APIs
-- Resume scoring and improvement suggestions
-- Multi-language support
-- Database integration for storing analysis results
-
-## Contact
-
-For questions or support, please open an issue on the repository or contact [your-email@example.com].
-
----
-
-**Note**: This application requires trained ML models to function properly. Ensure all model files are properly trained and placed in the correct directory before running the application.
