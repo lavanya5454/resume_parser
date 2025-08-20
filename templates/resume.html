@@ -1,121 +1,286 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resume Category Prediction</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            color: #333;
-        }
+{% block title %}Resume Parser AI - Intelligent Resume Analysis{% endblock %}
 
-        .container {
-            max-width: 600px;
-            margin: auto;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <!-- Hero Section -->
+        <div class="text-center mb-5 animate-fade-in">
+            <h1 class="display-4 fw-bold text-white mb-4">
+                <i class="fas fa-brain me-3"></i>
+                Resume Parser AI
+            </h1>
+            <p class="lead text-white-50 mb-4">
+                Intelligent resume analysis powered by machine learning. Get instant insights, categorization, and job recommendations.
+            </p>
+        </div>
 
-        h2 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
+        <!-- Upload Section -->
+        <div class="card mb-5 animate-fade-in">
+            <div class="card-body p-5">
+                <h2 class="card-title text-center mb-4">
+                    <i class="fas fa-upload me-2 text-primary"></i>
+                    Upload Your Resume
+                </h2>
+                
+                <form action="/pred" method="post" enctype="multipart/form-data" class="text-center">
+                    <div class="upload-area mb-4">
+                        <i class="fas fa-cloud-upload-alt fa-3x text-primary mb-3"></i>
+                        <h5 class="mb-3">Drag & Drop your resume here</h5>
+                        <p class="text-muted mb-3">or click to browse files</p>
+                        <input type="file" name="resume" accept=".pdf,.txt" required class="form-control d-none" id="resumeFile">
+                        <label for="resumeFile" class="btn btn-outline-primary">
+                            <i class="fas fa-folder-open me-2"></i>
+                            Choose File
+                        </label>
+                        <div class="file-name mt-3 text-muted"></div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 col-md-6 mx-auto">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-magic me-2"></i>
+                            Analyze Resume
+                        </button>
+                    </div>
+                </form>
 
-        form {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+                <div class="loading text-center mt-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-3 text-muted">Analyzing your resume with AI...</p>
+                </div>
 
-        input[type="file"] {
-            margin-bottom: 20px;
-        }
+                {% if message %}
+                <div class="alert alert-warning mt-4 animate-fade-in" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    {{ message }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
 
-        input[type="submit"] {
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        input[type="submit"]:hover {
-            background-color: #45a049;
-        }
-    </style>
-</head>
-
-<body>
-    <div class="container" style="margin-top:20px; background: linear-gradient(135deg, pink, red, blue); color:white;">
-
-
-        <h1 class="text center">Resume Screening AI base System</h1>
-        <p>This system supports TXT and PDF files, to be uploaded and it will work on the following....</p>
-        <ul>
-            <li>Resume Categorization</li>
-            <li>Resume Job Recommendation</li>
-            <li>Resume Parsing (Information Extraction)</li>
-        </ul>
-
-    </div>
-
-    <div class="container" style="background: linear-gradient(135deg, pink, red, blue); color:white;">
-
-        <h2>Upload Your Resume</h2>
-        <form action="/pred" method="post" enctype="multipart/form-data">
-            <input type="file" name="resume" accept=".pdf, .txt" required>
-            <input type="submit" value="Submit">
-        </form>
-
-        {% if message %}
-        <p class="text-center">{{message}}</p>
-        {% endif %}
-
+        <!-- Results Section -->
         {% if predicted_category %}
-        <br>
-        <hr>
-        <br>
-        <p class="text-center"><b><strong>Category:</strong></b> {{predicted_category}}</p>
-        <p class="text-center"><b><strong>Recommended Job:</strong></b> {{recommended_job}}</p>
-        <br>
-        <hr>
-        <h1 class="text-center">Extracted Information</h1>
-        <p class="text-center"><b><strong>Name:</strong></b> {{name}}</p>
-        <p class="text-center"><b><strong>Phone No:</strong></b> {{phone}}</p>
-        <p class="text-center"><b><strong>Email:</strong></b> {{email}}</p>
-        {% if extracted_skills %}
-        <p class="text-center"><b><strong>Skills</strong></b></p>
-        <ul class="list-unstyled text-center">
-            {% for skill in extracted_skills %}
-            <li>{{ skill }}</li>
-            {% endfor %}
-        </ul>
-        {% else %}
-        <p class="text-center">No skills founds.........</p>
-        <br>
-        {% if extracted_education %}
-        <h1 class="text-center">Education:</h1>
-        <ul class="list-unstyled text-center">
-            {% for edu in extracted_education %}
-            <li>{{ edu }}</li>
-            {% endfor %}
-        </ul>
-        {% else %}
-        <p class="text-center">No Education founds.........</p>
-        <br>
-        {% endif %}
-        {% endif %}
+        <div class="animate-fade-in">
+            <!-- Main Results -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="result-card">
+                        <h4 class="mb-3">
+                            <i class="fas fa-tags me-2 text-primary"></i>
+                            Resume Category
+                        </h4>
+                        <h3 class="text-primary fw-bold">{{ predicted_category }}</h3>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="result-card">
+                        <h4 class="mb-3">
+                            <i class="fas fa-briefcase me-2 text-success"></i>
+                            Recommended Job
+                        </h4>
+                        <h3 class="text-success fw-bold">{{ recommended_job }}</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Personal Information -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-user me-2"></i>
+                        Extracted Personal Information
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-muted">Name</label>
+                                <p class="fs-5">
+                                    {% if name %}
+                                        <i class="fas fa-user-circle me-2 text-primary"></i>
+                                        {{ name }}
+                                    {% else %}
+                                        <span class="text-muted">Not found</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-muted">Phone Number</label>
+                                <p class="fs-5">
+                                    {% if phone %}
+                                        <i class="fas fa-phone me-2 text-success"></i>
+                                        {{ phone }}
+                                    {% else %}
+                                        <span class="text-muted">Not found</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-muted">Email Address</label>
+                                <p class="fs-5">
+                                    {% if email %}
+                                        <i class="fas fa-envelope me-2 text-info"></i>
+                                        {{ email }}
+                                    {% else %}
+                                        <span class="text-muted">Not found</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Skills Section -->
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-cogs me-2"></i>
+                        Extracted Skills
+                        {% if extracted_skills %}
+                            <span class="badge bg-light text-success ms-2">{{ extracted_skills|length }} found</span>
+                        {% endif %}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    {% if extracted_skills %}
+                        <div class="skills-container">
+                            {% for skill in extracted_skills %}
+                                <span class="skill-tag">{{ skill }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No skills found in the resume</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Education Section -->
+            <div class="card mb-4">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0">
+                        <i class="fas fa-graduation-cap me-2"></i>
+                        Education Background
+                        {% if extracted_education %}
+                            <span class="badge bg-dark ms-2">{{ extracted_education|length }} found</span>
+                        {% endif %}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    {% if extracted_education %}
+                        <div class="education-container">
+                            {% for edu in extracted_education %}
+                                <span class="education-item">{{ edu }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-university fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No education information found in the resume</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="text-center mb-4">
+                <a href="/" class="btn btn-secondary btn-lg me-3">
+                    <i class="fas fa-upload me-2"></i>
+                    Analyze Another Resume
+                </a>
+                <button class="btn btn-outline-primary btn-lg" onclick="window.print()">
+                    <i class="fas fa-print me-2"></i>
+                    Print Results
+                </button>
+            </div>
+        </div>
         {% endif %}
 
+        <!-- Features Section -->
+        <div id="features" class="row mt-5">
+            <div class="col-12">
+                <h2 class="text-center text-white mb-5">
+                    <i class="fas fa-star me-2"></i>
+                    Key Features
+                </h2>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card text-center h-100">
+                    <div class="card-body">
+                        <div class="feature-icon mx-auto">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <h5 class="card-title">AI-Powered Analysis</h5>
+                        <p class="card-text">Advanced machine learning algorithms analyze and categorize resumes with high accuracy.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card text-center h-100">
+                    <div class="card-body">
+                        <div class="feature-icon mx-auto">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <h5 class="card-title">Information Extraction</h5>
+                        <p class="card-text">Automatically extracts key information including contact details, skills, and education.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card text-center h-100">
+                    <div class="card-body">
+                        <div class="feature-icon mx-auto">
+                            <i class="fas fa-bullseye"></i>
+                        </div>
+                        <h5 class="card-title">Job Recommendations</h5>
+                        <p class="card-text">Get personalized job role recommendations based on resume content and skills.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+</div>
+{% endblock %}
 
-</body>
+{% block scripts %}
+<script>
+    // Add some interactive features
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animate skill tags on hover
+        const skillTags = document.querySelectorAll('.skill-tag');
+        skillTags.forEach(tag => {
+            tag.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.1) rotate(2deg)';
+            });
+            tag.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1) rotate(0deg)';
+            });
+        });
 
-</html>
+        // Add copy to clipboard functionality for contact info
+        const contactInfo = document.querySelectorAll('[data-copy]');
+        contactInfo.forEach(element => {
+            element.addEventListener('click', function() {
+                navigator.clipboard.writeText(this.textContent);
+                // Show tooltip or notification
+                const originalText = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-check me-2"></i>Copied!';
+                setTimeout(() => {
+                    this.innerHTML = originalText;
+                }, 2000);
+            });
+        });
+    });
+</script>
+{% endblock %}

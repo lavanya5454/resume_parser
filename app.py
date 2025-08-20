@@ -2,14 +2,21 @@ from flask import Flask, request, render_template
 from PyPDF2 import PdfReader
 import re
 import pickle
+import os
 
 app = Flask(__name__)
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
 # Load models===========================================================================================================
-rf_classifier_categorization=pickle.load(open("/Users/apple/PycharmProjects/resume_parser/models/resume_parser_model.pkl","rb"))
-tfidf_vectorizer_categorization=pickle.load(open("/Users/apple/PycharmProjects/resume_parser/models/vectorizer_model.pkl","rb"))
-rf_classifier_job_recommendation = pickle.load(open("/Users/apple/PycharmProjects/resume_parser/models/rf_classifier_job_recommendation.pkl","rb"))
-tfidf_vectorizer_job_recommendation = pickle.load(open("/Users/apple/PycharmProjects/resume_parser/models/tfidf_vectorizer_job_recommendation.pkl","rb"))
+try:
+    rf_classifier_categorization=pickle.load(open("models/resume_parser_model.pkl","rb"))
+    tfidf_vectorizer_categorization=pickle.load(open("models/vectorizer_model.pkl","rb"))
+    rf_classifier_job_recommendation = pickle.load(open("models/rf_classifier_job_recommendation.pkl","rb"))
+    tfidf_vectorizer_job_recommendation = pickle.load(open("models/tfidf_vectorizer_job_recommendation.pkl","rb"))
+    print("Models loaded successfully!")
+except Exception as e:
+    print(f"Error loading models: {e}")
+    # You can add fallback behavior here
 
 # Clean resume==========================================================================================================
 def cleanResume(txt):
